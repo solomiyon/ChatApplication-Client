@@ -16,9 +16,6 @@ const login = async (data) => {
 const register = async (data) => {
    return await post("api/account", data);
 };
-const userProfile = async () => {
-  return await get("get");
-};
 const editProfile = async (data) => {
   return await put("edit", data);
 };
@@ -28,4 +25,10 @@ const getById = async (data) => {
 const getMyInfo = async () => {
   return await get("getMyInfo");
 }
-export { login, register, userProfile, editProfile, getById, getMyInfo };
+const searchUser = async (data) => {
+    return await get(`getUser/${data}`, data)
+}
+const getAll = async () => {
+  return await get("get/all");
+}
+export { login, register, editProfile, getById, getMyInfo, searchUser, getAll };
