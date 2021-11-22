@@ -11,7 +11,6 @@ const initialValues = {
   };
 
 const handleSubmit = async (values) => {
-    debugger;
     await register(values);
 }
 

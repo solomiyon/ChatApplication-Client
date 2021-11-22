@@ -1,9 +1,6 @@
 import Auth from "../Other/Auth";
 import { get, post, put, remove } from "../Other/MainApi"
 
-const isSignedIn = () => {
-  return !!Auth.getToken();
-}
 const login = async (data) => {
   const response = await post("api/account/login", data)
     .then((response) => {
@@ -31,4 +28,4 @@ const getById = async (data) => {
 const getMyInfo = async () => {
   return await get("getMyInfo");
 }
-export { login, register, userProfile, editProfile, isSignedIn, getById, getMyInfo };
+export { login, register, userProfile, editProfile, getById, getMyInfo };
