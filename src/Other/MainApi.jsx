@@ -1,34 +1,29 @@
 import axios from "axios";
-import { createBrowserHistory } from 'history';
+import { createBrowserHistory } from "history";
 import { BASE_URL } from "./Const";
 import { interceptors } from "./Interceptor";
 
-export const history = createBrowserHistory();
-  
+const header = {
+  "Accept": "application/json",
+  "Content-Type": "application/json",
+};
+
+const history = createBrowserHistory();
+
 const get = async (url, data, paramsSerializer) => {
   return await axios.get(BASE_URL + url, {
-    headers: {'Content-Type': 'application/json'}, 
+    headers: { "Content-Type": "application/json" },
     params: data,
-    paramsSerializer: paramsSerializer
+    paramsSerializer: paramsSerializer,
   });
 };
 
 const post = async (url, data) => {
-  return await axios.post(BASE_URL + url, data, {
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": 'application/json',
-    },
-  });
+  return await axios.post(BASE_URL + url, data, { header });
 };
 
 const put = async (url, data) => {
-  return await axios.put(BASE_URL + url, data, {
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+  return await axios.put(BASE_URL + url, data, { header });
 };
 
 const remove = async (url, data, options = {}) => {
@@ -38,4 +33,4 @@ const remove = async (url, data, options = {}) => {
   });
 };
 
-export { get, post, put, remove };
+export { get, post, put, remove, history };
