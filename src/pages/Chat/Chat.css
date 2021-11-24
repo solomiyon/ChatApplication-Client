@@ -1,0 +1,16 @@
+.list-item {
+  outline: 1px solid rgb(31, 29, 29);
+  padding: 7px;
+}
+.inp {
+  display: inline-flex;
+  width: 100%;
+}
+.outline {
+  outline: 1px solid rgb(31, 29, 29);
+  margin-right: 5px;
+}
+.menu {
+  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2) !important;
+  position: absolute;
+}
