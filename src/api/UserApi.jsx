@@ -16,7 +16,7 @@ const login = async (data) => {
 const register = async (data) => {
    return await post("api/account", data);
 };
-const editProfile = async (data) => {
+const editMyProfile = async (data) => {
   return await put("edit", data);
 };
 const getById = async (data) => {
@@ -31,4 +31,4 @@ const searchUser = async (data) => {
 const getAll = async () => {
   return await get("get/all");
 }
-export { login, register, editProfile, getById, getMyInfo, searchUser, getAll };
+export { login, register, editMyProfile, getById, getMyInfo, searchUser, getAll };

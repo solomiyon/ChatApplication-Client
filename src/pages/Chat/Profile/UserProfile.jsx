@@ -1,6 +1,6 @@
 import { Drawer, Typography, Avatar } from "antd";
 import { useState, useEffect } from "react";
-import { getById } from "../../api/UserApi";
+import { getById } from "../../../api/UserApi";
 
 const UserProfileForm = ({ visibleModal, setVisibleModal, userId }) => {
   const [data, setData] = useState({

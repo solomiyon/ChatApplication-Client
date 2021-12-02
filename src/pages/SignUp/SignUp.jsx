@@ -1,49 +1,49 @@
 import { Input, Button, Form } from "antd";
-import {register} from "../../api/UserApi"
-
-const initialValues = {
-    Name: '',
-    LastName: '',
-    Email: '',
-    Password: '',
-    ConfirmPassword: '',
-    PhoneNumber: '',
-  };
-
-const handleSubmit = async (values) => {
-    await register(values);
-}
+import { register } from "../../api/UserApi";
+import { useHistory } from "react-router-dom";
 
 export default function SignUp() {
+  const history = useHistory();
+  const initialValues = {
+    Name: "",
+    LastName: "",
+    Email: "",
+    Password: "",
+    ConfirmPassword: "",
+    PhoneNumber: "",
+  };
+
+  const handleSubmit = async (values) => {
+    await register(values);
+    history.push(`/signin`);
+  };
+
   return (
     <Form
       name="SignUpForm"
       initialValues={initialValues}
       onFinish={handleSubmit}
     >
-      <Form.Item name="FirstName">
+      <Form.Item name="firstName">
         <Input placeholder="Ім'я" />
       </Form.Item>
-      <Form.Item name="LastName">
+      <Form.Item name="lastName">
         <Input placeholder="Прізвище" />
       </Form.Item>
-      <Form.Item name="Email">
+      <Form.Item name="email">
         <Input placeholder="Електронна пошта" />
       </Form.Item>
-      <Form.Item name="Password">
-        <Input.Password
-          visibilityToggle={true}
-          placeholder="Пароль"
-        />
+      <Form.Item name="password">
+        <Input.Password visibilityToggle={true} placeholder="Пароль" />
       </Form.Item>
-      <Form.Item name="ConfirmPassword">
+      <Form.Item name="confirmPassword">
         <Input.Password
           className="form-control"
           visibilityToggle={true}
           placeholder="Підтвердіть пароль"
         />
       </Form.Item>
-      <Form.Item name="PhoneNumber">
+      <Form.Item name="phoneNumber">
         <Input placeholder="Номер телефону" />
       </Form.Item>
       <Form.Item>
