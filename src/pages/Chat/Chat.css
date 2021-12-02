@@ -1,10 +1,14 @@
 .list-item {
-  outline: 1px solid rgb(31, 29, 29);
+  outline: 1px solid rgb(116, 111, 111);
   padding: 7px;
+  width: 15px;
+  height: 60px;
+  margin: -11.3px;
+  margin-right: 0px;
+  margin-left: 0px;
 }
 .inp {
-  display: inline-flex;
-  width: 100%;
+  width: 300 px;
 }
 .outline {
   outline: 1px solid rgb(31, 29, 29);
@@ -13,4 +17,13 @@
 .menu {
   box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2) !important;
   position: absolute;
+}
+
+.chatList {
+  height: 95vh;
+  overflow-y: scroll;
+}
+.messageList {
+  height: 88vh;
+  overflow-y: scroll;
 }

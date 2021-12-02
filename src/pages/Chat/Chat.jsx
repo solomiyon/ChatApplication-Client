@@ -17,29 +17,37 @@ import {
   Menu,
   Typography,
   Dropdown,
+  Affix,
+  message,
 } from "antd";
 import { SendOutlined, MenuOutlined } from "@ant-design/icons";
 import "./Chat.css";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import AddChatForm from "./AddChat";
-import AddChanelForm from "./AddChanel";
-import MyProfileForm from "./MyProfile";
-import UserProfileForm from "./UserProfile";
+import AddChatForm from "./AddForm/AddChat";
+import AddChanelForm from "./AddForm/AddChanel";
+import MyProfileForm from "./Profile/MyProfile";
+import UserProfileForm from "./Profile/UserProfile";
 import Auth from "../../Other/Auth";
-import DeleteMessForm from "./DeleteMessForm";
+import DeleteMessForm from "./DeleteForm/DeleteMessForm";
 import ClickAwayListener from "react-click-away-listener";
+import DeleteChatForm from "./DeleteForm/DeleteChatForm";
+import AddChanelUsersForm from "./AddForm/AddChanelUsers";
+import moment from "moment";
 
 export default function Chat() {
   const [chat, setChat] = useState([]);
   const [chatMessages, setChatMessages] = useState([]);
-  const [chatList, setChatList] = useState(Array);
+  const [chatList, setChatList] = useState([]);
   const [currentChatId, setCurrentChatId] = useState();
   const [visibleAddChat, setVisibleAddChat] = useState();
   const [visibleAddChanel, setVisibleAddChanel] = useState();
   const [visibleMyProfile, setVisibleMyProfile] = useState();
   const [visibleUserProfile, setVisibleUserProfile] = useState();
   const [showDeleteForm, setShowDeleteForm] = useState();
+  const [showDeleteChatForm, setShowDeleteChatForm] = useState();
+  const [visibleAddChanelUsers, setVisibleAddChanelUsers] = useState();
   const [messageId, setMessageId] = useState();
+  const [chatId, setChatId] = useState();
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
   const [form] = Form.useForm();
@@ -52,8 +60,8 @@ export default function Chat() {
     const chat = await getChat(chatId);
     setChat(chat.data);
     setChatMessages(chat.data.messages);
-    console.log(chatMessages);
     setCurrentChatId(chatId);
+    console.log(currentChatId);
   };
 
   const getChatList = async () => {
@@ -75,12 +83,24 @@ export default function Chat() {
   const showDrawerUserProfile = () => {
     setVisibleUserProfile(true);
   };
+  const showDrawerAddChannelUsers = () => {
+    setVisibleAddChanelUsers(true);
+  };
   const handleClickAway = () => {
     setShowDeleteForm(false);
   };
+  const handleClickChatAway = () => {
+    setShowDeleteChatForm(false);
+  };
+
   const handleDeleteMessage = (id) => {
     const filteredMessages = chatMessages.filter((d) => d.id !== id);
     setChatMessages([...filteredMessages]);
+  };
+
+  const handleDeleteChat = (id) => {
+    const filteredChats = chatList.filter((d) => d.id !== id);
+    setChatList([...filteredChats]);
   };
 
   const menu = (
@@ -90,6 +110,22 @@ export default function Chat() {
       <Menu.Item onClick={showDrawerAddChanel}>New Chanel</Menu.Item>
     </Menu>
   );
+
+  const hubConnection = new HubConnectionBuilder()
+    .withUrl("http://localhost:44841/chat", {
+      accessTokenFactory: () => Auth.getToken(),
+    })
+    .build();
+
+  useEffect(() => {
+    hubConnection.start();
+  }, []);
+
+  hubConnection.on("ReceiveMessage", (data) => {
+    console.log(chatMessages, data);
+
+    setChatMessages((prevState) => [...(prevState || []), data]);
+  });
 
   const sendMessage = async (mess) => {
     const chatMessage = {
@@ -124,6 +160,7 @@ export default function Chat() {
             style={{ width: 200 }}
           />
           <List
+            className="chatList"
             itemLayout="horizontal"
             dataSource={chatList}
             renderItem={(item) => (
@@ -131,7 +168,14 @@ export default function Chat() {
                 onClick={() => {
                   getChatById(item.chatId);
                 }}
-                style={{ overflow: "hidden", wordBreak: "break-word" }}
+                onContextMenu={(event) => {
+                  event.preventDefault();
+                  setChatId(item.chatId);
+                  setShowDeleteChatForm(true);
+                  setX(event.pageX);
+                  setY(event.pageY);
+                }}
+                style={{ wordBreak: "break-word" }}
               >
                 {item.type === 0 ? (
                   <List.Item.Meta
@@ -155,17 +199,23 @@ export default function Chat() {
         </Col>
 
         <Col flex={7}>
-          <Title level={3} onClick={showDrawerUserProfile}>
-            {chat.firstName + " " + chat.lastName}
-          </Title>
+          {chat.type === 0 ? (
+            <Title level={3} onClick={showDrawerUserProfile}>
+              {chat.firstName + " " + chat.lastName}
+            </Title>
+          ) : (
+            <Title level={3} onClick={showDrawerAddChannelUsers}>
+              {chat.name}
+            </Title>
+          )}
           <List
+            className="messageList"
             itemLayout="horizontal"
             dataSource={chatMessages}
             renderItem={(item) => (
               <List.Item
                 onClick={() => {
                   setShowDeleteForm(false);
-                  console.log(messageId);
                 }}
                 onContextMenu={(event) => {
                   event.preventDefault();
@@ -176,37 +226,44 @@ export default function Chat() {
                   setY(event.pageY);
                 }}
               >
-                {item.userId ? (
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        onClick={showDrawerUserProfile}
-                        src="https://joeschmoe.io/api/v1/random"
-                      />
-                    }
-                    title={item.text}
-                    description={item.date}
-                  />
-                ) : (
-                  <List.Item.Meta
-                    avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                    title={item.text}
-                    description={item.date}
-                  />
-                )}
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      onClick={showDrawerUserProfile}
+                      src="https://joeschmoe.io/api/v1/random"
+                    />
+                  }
+                  title={item.text}
+                  description={moment.utc(item.date).local().format("DD.MM.YYYY HH:mm")}
+                />
               </List.Item>
             )}
           />
+          {/* <div>
+            {(chatMessages || []).map((i) => {
+              return (
+                <div className="message">
+                  <p>{i.text}</p>
+                </div>
+              );
+            })}
+          </div> */}
           <Form
             className="inp"
             onFinish={sendMessage}
             form={form}
             autoComplete="off"
           >
-            <Form.Item name="text">
-              <Input placeholder="Write a message"></Input>
-            </Form.Item>
-            <Button type="primary" htmlType="submit" icon={<SendOutlined />} />
+            <Input.Group compact>
+              <Form.Item name="text">
+                <Input placeholder="Write a message"></Input>
+              </Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SendOutlined />}
+              />
+            </Input.Group>
           </Form>
         </Col>
       </Row>
@@ -219,13 +276,24 @@ export default function Chat() {
           pageY={y}
         />
       </ClickAwayListener>
+      <ClickAwayListener onClickAway={handleClickChatAway}>
+        <DeleteChatForm
+          showDeleteChatForm={showDeleteChatForm}
+          chat={chatId}
+          onDelete={handleDeleteChat}
+          pageX={x}
+          pageY={y}
+        />
+      </ClickAwayListener>
       <AddChatForm
         visibleModal={visibleAddChat}
         setVisibleModal={setVisibleAddChat}
+        getChats={getChatList}
       />
       <AddChanelForm
         visibleModal={visibleAddChanel}
         setVisibleModal={setVisibleAddChanel}
+        getChats={getChatList}
       />
       <MyProfileForm
         visibleModal={visibleMyProfile}
@@ -235,6 +303,11 @@ export default function Chat() {
         visibleModal={visibleUserProfile}
         setVisibleModal={setVisibleUserProfile}
         userId={chat.userId}
+      />
+      <AddChanelUsersForm
+        visibleModal={visibleAddChanelUsers}
+        setVisibleModal={setVisibleAddChanelUsers}
+        сurrentChat={currentChatId}
       />
     </Layout.Content>
   );
